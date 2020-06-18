@@ -19,7 +19,7 @@ class Tetris : public BaseScene {
 	Tetris();
 	~Tetris();
 
-	void update(double delta);
+	void Update(int64_t delta);
 	void Render();
 	void RenderGUI();
 };
@@ -60,10 +60,6 @@ class Tetris::TetrisMap{
 		}
 	}
 };
-
-
-void Tetris::update(double) {
-}
 
 class Tetris::peca {
 	Tetris* game;
@@ -146,30 +142,35 @@ class Tetris::bagulhin : public Tetris::peca {
 	}
 };
 
-void Tetris::Render() {
-	for (unsigned int h = 0; h < MAP_HEIGHT; ++h)
-		for (unsigned int w = 0; w < MAP_WIDTH; ++w) {
-			renderer->DrawnQuad({(float)w, (float)h, 0.0f}, {0.0f, 0.35f, 1.0f, 0.10f}, {0.95f, 0.95f});
-		}
-	static std::chrono::steady_clock::time_point tp = std::chrono::steady_clock::now();
-	if (tp <= std::chrono::steady_clock::now()) {
-		tp += std::chrono::seconds(1);
+void Tetris::Update(int64_t delta) {
+	constexpr int64_t moveTime = 100*10e6, inputTime = 30*10e6;
+	static int64_t time = 0, nextMoveTime = 0, nextInputTime = 0;
+	time += delta;
+	if(time < 0) throw std::overflow_error("why keep playing for so long");
+	if (time >= nextMoveTime) {
+		nextMoveTime = time + moveTime;
 		atual->move(0, -1);
-		if (keyboard::w) atual->rotate(1);
 	}
-	static std::chrono::steady_clock::time_point tp2 = std::chrono::steady_clock::now();
-	if (tp2 <= std::chrono::steady_clock::now()) {
-		tp2 += std::chrono::milliseconds(30);
-		if (keyboard::d) atual->move( 1, 0);
+	if (time >= nextInputTime) {
+		nextInputTime = time + inputTime;
+		if (keyboard::w) atual->rotate(1);
+		if (keyboard::d) atual->move(1, 0);
 		if (keyboard::a) atual->move(-1, 0);
 	}
-	if(atual->cantMove(0, -1)){
+	if (atual->cantMove(0, -1)) {
 		//to do when die: check is sound is loaded
 		audio::queue(putBlock);
 		atual->die();
 		delete atual;
 		atual = new bagulhin(this);
 	}
+}
+
+void Tetris::Render() {
+	for (unsigned int h = 0; h < MAP_HEIGHT; ++h)
+		for (unsigned int w = 0; w < MAP_WIDTH; ++w) {
+			renderer->DrawnQuad({(float)w, (float)h, 0.0f}, {0.0f, 0.35f, 1.0f, 0.10f}, {0.95f, 0.95f});
+		}
 	Map->update();
 	Map->render();
 	atual->render();

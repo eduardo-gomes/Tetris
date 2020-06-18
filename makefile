@@ -1,8 +1,8 @@
-CXX=g++
-CXXFLAGS=-std=c++17 -pedantic-errors -Wall -Wextra -Wsign-conversion -Werror
-LIBS=-lSDL2 -lGL -lm -lvorbis -lvorbisfile -ldl -lpthread
-DBG?=-g
-OPTIMIZATION?=-O3 -march=native -mfpmath=sse
+export CXX=g++
+export CXXFLAGS=-std=c++17 -pedantic-errors -Wall -Wextra -Wsign-conversion -Werror
+export LIBS=-lSDL2 -lGL -lm -lvorbis -lvorbisfile -ldl -lpthread
+export DBG?=-g
+export OPTIMIZATION?=-O3 -march=native -mfpmath=sse -flto
 
 LIBS=-lSDL2 -lGL -lm -lvorbis -lvorbisfile -ldl -lpthread
 
@@ -13,7 +13,7 @@ INCLUDE_F=$(patsubst %, -I$(DuEngineDIR)/%, $(_INLCUDE_F))
 
 LIBS_OBJ=libglad.so libimgui.so libDuEngine.so
 Tetris.o: tetris.cpp $(LIBS_OBJ)
-	$(CXX) -o $@ $< $(CXXFLAGS) $(DBG) $(INCLUDE_F) -L$(DuEngineDIR) -lglad -limgui -lDuEngine $(LIBS) -Wl,-rpath=$(DuEngineDIR)
+	$(CXX) -o $@ $< $(CXXFLAGS) $(DBG) $(INCLUDE_F) -L$(DuEngineDIR) -lglad -limgui -lDuEngine $(LIBS) -Wl,-rpath=$(DuEngineDIR) $(OPTIMIZATION)
 
 .PHONY: clear Prepare clearAll DuEngineBuild
 clear:
