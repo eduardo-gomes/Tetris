@@ -1,7 +1,9 @@
 #include <chrono>
+#include <future>
 
 #include <DuEngine/DuEngine.hpp>
-
+unsigned int korobeiniki, putBlock;
+bool assets_loaded = false;
 namespace scene {
 class Tetris : public BaseScene {
    private:
@@ -162,7 +164,8 @@ void Tetris::Render() {
 		if (keyboard::a) atual->move(-1, 0);
 	}
 	if(atual->cantMove(0, -1)){
-		//to do when die: copy blocks and color to a matrix
+		//to do when die: check is sound is loaded
+		audio::queue(putBlock);
 		atual->die();
 		delete atual;
 		atual = new bagulhin(this);
@@ -197,8 +200,19 @@ Tetris::~Tetris() {
 }  // namespace scene
 
 int main(){
+	audio::musicReserve(1);
 	Start("DuTetris");
 }
+
+void load_assets(){
+	audio::loaded_sounds.emplace_back(audio::create_sound("assets/korobeiniki.ogg"));
+	korobeiniki = audio::loaded_sounds.size() - 1;
+	audio::loaded_sounds.emplace_back(audio::create_sound("assets/sfx_sounds_impact1.ogg"));
+	putBlock = audio::loaded_sounds.size() - 1;
+	assets_loaded = true;
+	korobeiniki = audio::music(korobeiniki);
+}
 void Setup(){
+	std::thread(load_assets).detach();
 	new scene::Tetris;
 }
