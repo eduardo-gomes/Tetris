@@ -11,8 +11,13 @@ class Tetris : public BaseScene {
 	class TetrisMap;
 	TetrisMap* Map;
 	class peca;
-	peca* atual;
-	class bagulhin;
+	peca *atual, *next;
+	class pecaT;
+	class pecaCubo;
+	class bagulhinPraEsquerda;
+	class bagulhinPraDireita;
+	class pecaI;
+	peca* randomPeca();
 	friend peca;
 
    public:
@@ -24,7 +29,7 @@ class Tetris : public BaseScene {
 	void RenderGUI();
 };
 
-constexpr unsigned int MAP_HEIGHT = 15, MAP_WIDTH = 8;
+constexpr unsigned int MAP_HEIGHT = 16, MAP_WIDTH = 9;
 class Tetris::TetrisMap{
 	Tetris* game;
 	bool ocuped[MAP_HEIGHT][MAP_WIDTH];
@@ -68,7 +73,7 @@ class Tetris::peca {
 	const float (&positions)[4][4][2];
 	int rotation = 0;
 	int xpos, ypos;
-	peca(const float (&arr)[4][4][2], Tetris* t) : game(t), cor({Random::getf(), Random::getf(), Random::getf(), 1.0f}), positions(arr), xpos(3), ypos(13){}
+	peca(const float (&arr)[4][4][2], Tetris* t) : game(t), cor({Random::getf(), Random::getf(), Random::getf(), 1.0f}), positions(arr), xpos(MAP_WIDTH/2-1), ypos(MAP_HEIGHT-3){}
 
    public:
 	virtual ~peca(){}
@@ -127,20 +132,90 @@ class Tetris::peca {
 		for (int i = 0; i < 4; ++i)
 			renderer->DrawnQuad({positions[rotation % 4][i][0] + xpos, positions[rotation % 4][i][1] + ypos, 0.0f}, cor, {0.975f, 0.975f});
 	}
+	void disp(){
+		constexpr float ydisp = MAP_HEIGHT - 4, xdisp = MAP_HEIGHT * (16.0/9*0.9) - 4/*peca size*/ - 5 /*dist from border*/;
+		for (int i = 0; i < 4; ++i)
+			renderer->DrawnQuad({positions[0][i][0] + xdisp, positions[0][i][1] + ydisp, 0.0f}, cor, {0.975f, 0.975f});
+	}
 };
 
-class Tetris::bagulhin : public Tetris::peca {
+class Tetris::pecaT : public Tetris::peca {
    public:
 	const float positions[4][4][2] = {
 		//[rotation] [piece] [cord]
 		{{0.0f, 0.0f}, {1.0f, 0.0f}, {2.0f, 0.0f}, {1.0f, 1.0f}},	 //up
 		{{0.0f, 0.0f}, {0.0f, 1.0f}, {0.0f, 2.0f}, {1.0f, 1.0f}},	 //right
-		{{0.0f, 1.0f}, {1.0f, 1.0f}, {2.0f, 1.0f}, {1.0f, 0.0f}},	 //down
-		{{1.0f, 0.0f}, {1.0f, 1.0f}, {1.0f, 2.0f}, {0.0f, 1.0f}},	 //left
+		{{0.0f, 2.0f}, {1.0f, 2.0f}, {2.0f, 2.0f}, {1.0f, 1.0f}},	 //down
+		{{2.0f, 0.0f}, {2.0f, 1.0f}, {2.0f, 2.0f}, {1.0f, 1.0f}},	 //left
 	};
-	bagulhin(Tetris*t) : peca(positions, t) {
+	pecaT(Tetris*t) : peca(positions, t) {
 	}
 };
+class Tetris::pecaCubo : public Tetris::peca {
+   public:
+	const float positions[4][4][2] = {
+		//[rotation] [piece] [cord]
+		{{0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f}},  //symetric
+		{{0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f}},  //symetric
+		{{0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f}},  //symetric
+		{{0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f}},  //symetric
+	};
+	pecaCubo(Tetris* t) : peca(positions, t) {
+	}
+};
+class Tetris::pecaI : public Tetris::peca {
+   public:
+	const float positions[4][4][2] = {
+		//[rotation] [piece] [cord]
+		{{1.0f, 0.0f}, {1.0f, 1.0f}, {1.0f, 2.0f}, {1.0f, -1.0f}},  //H
+		{{0.0f, 1.0f}, {1.0f, 1.0f}, {2.0f, 1.0f}, {3.0f, 1.0f}},  //V
+		{{1.0f, 0.0f}, {1.0f, 1.0f}, {1.0f, 2.0f}, {1.0f, -1.0f}},  //H
+		{{0.0f, 1.0f}, {1.0f, 1.0f}, {2.0f, 1.0f}, {3.0f, 1.0f}},  //V
+	};
+	pecaI(Tetris* t) : peca(positions, t) {
+	}
+};
+class Tetris::bagulhinPraEsquerda : public Tetris::peca {
+   public:
+	const float positions[4][4][2] = {
+		//[rotation] [piece] [cord]
+		{{1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 2.0f}},  //H
+		{{0.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 2.0f}, {2.0f, 2.0f}},  //V
+		{{1.0f, 2.0f}, {1.0f, 1.0f}, {2.0f, 1.0f}, {2.0f, 0.0f}},  //H
+		{{0.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 2.0f}, {2.0f, 2.0f}},  //V
+	};
+	bagulhinPraEsquerda(Tetris* t) : peca(positions, t) {
+	}
+};
+class Tetris::bagulhinPraDireita : public Tetris::peca {
+   public:
+	const float positions[4][4][2] = {
+		//[rotation] [piece] [cord]
+		{{1.0f, 0.0f}, {1.0f, 1.0f}, {2.0f, 1.0f}, {2.0f, 2.0f}},  //H
+		{{0.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}, {2.0f, 0.0f}},  //V
+		{{1.0f, 2.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 0.0f}},  //H
+		{{0.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}, {2.0f, 0.0f}},  //V
+	};
+	bagulhinPraDireita(Tetris* t) : peca(positions, t) {
+	}
+};
+Tetris::peca* Tetris::randomPeca(){
+	int pecaNum = Random::get()%5;
+	switch (pecaNum)
+	{
+	case 0:
+		return new pecaT(this);
+	case 1:
+		return new pecaCubo(this);
+	case 2:
+		return new pecaI(this);
+	case 3:
+		return new bagulhinPraEsquerda(this);
+	case 4:
+		return new bagulhinPraDireita(this);
+	}
+	throw std::domain_error("Invalid peça index");
+}
 
 void Tetris::Update(int64_t delta) {
 	constexpr int64_t moveTime = 100*10e6, inputTime = 30*10e6;
@@ -151,18 +226,27 @@ void Tetris::Update(int64_t delta) {
 		nextMoveTime = time + moveTime;
 		atual->move(0, -1);
 	}
-	if (time >= nextInputTime) {
+	if (time >= nextInputTime) {}
 		nextInputTime = time + inputTime;
-		if (keyboard::w) atual->rotate(1);
-		if (keyboard::d) atual->move(1, 0);
-		if (keyboard::a) atual->move(-1, 0);
-	}
+		if (keyboard::w) if (atual->rotate(1))  	keyboard::w = 0;
+		if (keyboard::d) if (atual->move(1, 0)) 	keyboard::d = 0;
+		if (keyboard::a) if (atual->move(-1, 0)) 	keyboard::a = 0;
+		if (keyboard::space){
+			while (!atual->cantMove(0, -1)) atual->move(0, -1);
+		keyboard::space = 0;
+		}
+	//}
 	if (atual->cantMove(0, -1)) {
 		//to do when die: check is sound is loaded
 		audio::queue(putBlock);
 		atual->die();
 		delete atual;
-		atual = new bagulhin(this);
+		atual = next;
+		next = randomPeca();
+		if(atual->cantMove(0, 0)){
+			printf("Can't spawn, points: %d \n", points);
+			new Tetris;
+		}
 	}
 }
 
@@ -174,6 +258,7 @@ void Tetris::Render() {
 	Map->update();
 	Map->render();
 	atual->render();
+	next->disp();
 	renderer->Drawn();
 }
 void Tetris::RenderGUI() {
@@ -189,13 +274,15 @@ void Tetris::RenderGUI() {
 
 Tetris::Tetris() {
 	Map = new TetrisMap(this);
-	Renderer::LookAt(4.0f, 7.5f, 20.0f, 4.0f, 7.5f, 0.0f, 0.0f, 1.0f, 0.0f);
-	atual = new bagulhin(this);
-	printf("Tetris constructor\n");
+	float x = (float)MAP_WIDTH / 2, y = (float)MAP_HEIGHT / 2, z = y/tan(screen::fovy/2*M_PI/180)*1.1;
+	Renderer::LookAt(x, y, z, x, y, 0.0f, 0.0f, 1.0f, 0.0f);
+	atual = new pecaT(this);
+	next = randomPeca();
 }
 Tetris::~Tetris() {
 	delete Map;
 	delete atual;
+	delete next;
 }
 
 }  // namespace scene
