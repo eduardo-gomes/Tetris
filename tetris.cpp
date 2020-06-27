@@ -19,6 +19,7 @@ class Tetris : public BaseScene {
 	class pecaI;
 	peca* randomPeca();
 	friend peca;
+	Texture *blockText;
 
    public:
 	Tetris();
@@ -43,7 +44,7 @@ class Tetris::TetrisMap{
 	void render(){
 		for (unsigned int x = 0; x < MAP_WIDTH; ++x)
 			for (unsigned int y = 0; y < MAP_HEIGHT; ++y)
-				if (ocuped[y][x]) renderer->DrawnQuad({(float)x, (float)y, 0.0f}, color[y][x], {0.975f, 0.975f});
+				if (ocuped[y][x]) renderer->DrawnQuad({(float)x, (float)y, 0.0f}, color[y][x], {1.0f, 1.0f}, *game->blockText);
 	}
 	TetrisMap(Tetris* g): game(g){
 		for(unsigned int y = 0; y < MAP_HEIGHT; ++y)
@@ -130,12 +131,12 @@ class Tetris::peca {
 	}
 	void render() {
 		for (int i = 0; i < 4; ++i)
-			renderer->DrawnQuad({positions[rotation % 4][i][0] + xpos, positions[rotation % 4][i][1] + ypos, 0.0f}, cor, {0.975f, 0.975f});
+			renderer->DrawnQuad({positions[rotation % 4][i][0] + xpos, positions[rotation % 4][i][1] + ypos, 0.0f}, cor, {1.0f, 1.0f}, *game->blockText);
 	}
 	void disp(){
 		constexpr float ydisp = MAP_HEIGHT - 4, xdisp = MAP_HEIGHT * (16.0/9*0.9) - 4/*peca size*/ - 5 /*dist from border*/;
 		for (int i = 0; i < 4; ++i)
-			renderer->DrawnQuad({positions[0][i][0] + xdisp, positions[0][i][1] + ydisp, 0.0f}, cor, {0.975f, 0.975f});
+			renderer->DrawnQuad({positions[0][i][0] + xdisp, positions[0][i][1] + ydisp, 0.0f}, cor, {1.0f, 1.0f}, *game->blockText);
 	}
 };
 
@@ -278,6 +279,7 @@ Tetris::Tetris() {
 	Renderer::LookAt(x, y, z, x, y, 0.0f, 0.0f, 1.0f, 0.0f);
 	atual = new pecaT(this);
 	next = randomPeca();
+	blockText = new Texture("assets/bloco.bmp");
 }
 Tetris::~Tetris() {
 	delete Map;
