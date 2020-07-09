@@ -2,7 +2,7 @@
 #include <future>
 
 #include <DuEngine/DuEngine.hpp>
-unsigned int korobeiniki, putBlock;
+std::shared_ptr<audio::WAVE> putBlock;
 bool assets_loaded = false;
 namespace scene {
 class Tetris : public BaseScene {
@@ -239,7 +239,7 @@ void Tetris::Update(int64_t delta) {
 	//}
 	if (atual->cantMove(0, -1)) {
 		//to do when die: check is sound is loaded
-		audio::queue(putBlock);
+		audio::audioOut->EnqueueSound(putBlock);
 		atual->die();
 		delete atual;
 		atual = next;
@@ -290,17 +290,14 @@ Tetris::~Tetris() {
 }  // namespace scene
 
 int main(){
-	audio::musicReserve(1);
 	Start("DuTetris");
 }
 
 void load_assets(){
-	audio::loaded_sounds.emplace_back(audio::create_sound("assets/korobeiniki.ogg"));
-	korobeiniki = audio::loaded_sounds.size() - 1;
-	audio::loaded_sounds.emplace_back(audio::create_sound("assets/sfx_sounds_impact1.ogg"));
-	putBlock = audio::loaded_sounds.size() - 1;
+	auto &korobeiniki = Manager::Insatance->LoadOGG("assets/korobeiniki.ogg");
+	putBlock = Manager::Insatance->LoadOGG("assets/sfx_sounds_impact1.ogg");
+	audio::audioOut->EnqueueMusic(korobeiniki);//Need to make controlable outside this function
 	assets_loaded = true;
-	korobeiniki = audio::music(korobeiniki);
 }
 void Setup(){
 	std::thread(load_assets).detach();
