@@ -290,12 +290,12 @@ Tetris::~Tetris() {
 }  // namespace scene
 
 int main(){
-	Start("DuTetris");
+	Start("DuTetris", 1);
 }
 
 void load_assets(){
-	auto &korobeiniki = Manager::Insatance->LoadOGG("assets/korobeiniki.ogg");
-	putBlock = Manager::Insatance->LoadOGG("assets/sfx_sounds_impact1.ogg");
+	auto &korobeiniki = Man::Manager::Insatance->LoadOGG("assets/korobeiniki.ogg");
+	putBlock = Man::Manager::Insatance->LoadOGG("assets/sfx_sounds_impact1.ogg");
 	audio::audioOut->EnqueueMusic(korobeiniki);//Need to make controlable outside this function
 	assets_loaded = true;
 }

@@ -1,10 +1,10 @@
 export CXX=g++
 export CXXFLAGS=-std=c++17 -pedantic-errors -Wall -Wextra -Wsign-conversion -Werror
-export LIBS=-lSDL2 -lGL -lm -lvorbis -lvorbisfile -ldl -lpthread
+export LIBS=-lSDL2 -lGL -lm -ldl -lpthread
 export DBG?=-g
 export OPTIMIZATION?=-O3 -march=native -mfpmath=sse -flto
 
-LIBS=-lSDL2 -lGL -lm -lvorbis -lvorbisfile -ldl -lpthread
+LIBS=-lSDL2 -lGL -lm -ldl -lpthread
 
 
 DuEngineDIR=DuEngine
