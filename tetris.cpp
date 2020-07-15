@@ -201,9 +201,8 @@ class Tetris::bagulhinPraDireita : public Tetris::peca {
 	}
 };
 Tetris::peca* Tetris::randomPeca(){
-	int pecaNum = Random::get()%5;
-	switch (pecaNum)
-	{
+	unsigned int pecaNum = Random::get()%5;
+	switch (pecaNum)	{
 	case 0:
 		return new pecaT(this);
 	case 1:
@@ -288,9 +287,11 @@ Tetris::~Tetris() {
 }
 
 }  // namespace scene
-
+void SetupFunc();
 int main(){
+	Setup = SetupFunc;
 	Start("DuTetris", 1);
+	return 0;
 }
 
 void load_assets(){
@@ -299,7 +300,16 @@ void load_assets(){
 	audio::audioOut->EnqueueMusic(korobeiniki);//Need to make controlable outside this function
 	assets_loaded = true;
 }
-void Setup(){
+void SetupFunc() {
 	std::thread(load_assets).detach();
 	new scene::Tetris;
 }
+#ifdef _WIN32
+int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
+	(void)hInstance;
+	(void)hPrevInstance;
+	(void)lpCmdLine;
+	(void)nShowCmd;
+	return main();
+}
+#endif

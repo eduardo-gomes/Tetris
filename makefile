@@ -5,6 +5,7 @@ export DBG?=-g
 export OPTIMIZATION?=-O3 -march=native -mfpmath=sse -flto
 
 LIBS=-lSDL2 -lGL -lm -ldl -lpthread
+LIBSW64=-lSDL2 -lopengl32 -lm -lpthread
 
 
 DuEngineDIR=DuEngine
@@ -12,10 +13,14 @@ _INLCUDE_F=dependencies/include dependencies/imgui .
 INCLUDE_F=$(patsubst %, -I$(DuEngineDIR)/%, $(_INLCUDE_F))
 
 LIBS_OBJ=libglad.so libimgui.so libDuEngine.so
+LIBS_OBJW64=libglad.dll libimgui.dll libDuEngine.dll
 Tetris.o: tetris.cpp $(LIBS_OBJ)
 	$(CXX) -o $@ $< $(CXXFLAGS) $(DBG) $(INCLUDE_F) -L$(DuEngineDIR) -lglad -limgui -lDuEngine $(LIBS) -Wl,-rpath=$(DuEngineDIR) $(OPTIMIZATION)
 
-.PHONY: clear Prepare clearAll DuEngineBuild
+Tetris.exe: tetris.cpp $(LIBS_OBJW64)
+	$(CXX) -o $@ $< $(CXXFLAGS) $(DBG) $(INCLUDE_F) -L$(DuEngineDIR) -llibglad -llibimgui -llibDuEngine $(LIBSW64) -Wl,-rpath=$(DuEngineDIR) $(OPTIMIZATION) $(LIBSW64)
+
+.PHONY: clear Prepare clearAll DuEngineBuild DuEngineBuildw64
 clear:
 	rm -f Tetris.o
 
@@ -29,6 +34,10 @@ Prepare:
 $(LIBS_OBJ): DuEngineBuild
 DuEngineBuild:
 	$(MAKE) -C DuEngine build
+
+$(LIBS_OBJW64): DuEngineBuildw64
+DuEngineBuildw64:
+	$(MAKE) -C DuEngine buildwin
 
 IMGUIDIR=dependencies/imgui
 _IMGUISRC=imgui.cpp imgui_demo.cpp imgui_draw.cpp imgui_impl_opengl3.cpp imgui_impl_sdl.cpp imgui_widgets.cpp
