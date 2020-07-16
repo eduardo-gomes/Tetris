@@ -33,3 +33,6 @@
 
 #folders
 .vscode
+/build/
+/assets/
+*.code-workspace

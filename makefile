@@ -13,7 +13,7 @@ INCLUDE_F=$(patsubst %, -I$(DuEngineDIR)/%, $(_INLCUDE_F))
 
 LIBS_OBJ=libglad.so libimgui.so libDuEngine.so
 Tetris.o: tetris.cpp $(LIBS_OBJ)
-	$(CXX) -o $@ $< $(CXXFLAGS) $(DBG) $(INCLUDE_F) -L$(DuEngineDIR) -lglad -limgui -lDuEngine $(LIBS) -Wl,-rpath=$(DuEngineDIR) $(OPTIMIZATION)
+	$(CXX) -o $@ $< $(CXXFLAGS) $(OPTIMIZATION) $(DBG) $(INCLUDE_F) -L$(DuEngineDIR) -lglad -limgui -lDuEngine $(LIBS) -Wl,-rpath=$(DuEngineDIR)
 
 .PHONY: clear Prepare clearAll DuEngineBuild
 clear:
