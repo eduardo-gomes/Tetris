@@ -272,7 +272,7 @@ void Tetris::RenderGUI() {
 	if (Info) renderer->DispInfo();
 }
 
-Tetris::Tetris() {
+Tetris::Tetris() : points(0) {
 	Map = new TetrisMap(this);
 	float x = (float)MAP_WIDTH / 2, y = (float)MAP_HEIGHT / 2, z = y/tan(screen::fovy/2*M_PI/180)*1.1;
 	Renderer::LookAt(x, y, z, x, y, 0.0f, 0.0f, 1.0f, 0.0f);
