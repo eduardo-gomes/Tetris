@@ -12,13 +12,13 @@ DuEngineDIR=DuEngine
 _INLCUDE_F=dependencies/include dependencies/imgui .
 INCLUDE_F=$(patsubst %, -I$(DuEngineDIR)/%, $(_INLCUDE_F))
 
-LIBS_OBJ=libglad.so libimgui.so libDuEngine.so
-LIBS_OBJW64=libglad.dll libimgui.dll
+LIBS_OBJ=libDuEngine.so
+LIBS_OBJW64=libDuEngine.dll
 Tetris.o: tetris.cpp $(LIBS_OBJ)
-	$(CXX) -o $@ $< $(CXXFLAGS) $(DBG) $(INCLUDE_F) -L$(DuEngineDIR) -lglad -limgui -lDuEngine $(LIBS) -Wl,-rpath=$(DuEngineDIR) $(OPTIMIZATION)
+	$(CXX) -o $@ $< $(CXXFLAGS) $(DBG) $(INCLUDE_F) -L$(DuEngineDIR) -lDuEngine $(LIBS) -Wl,-rpath=$(DuEngineDIR) $(OPTIMIZATION)
 
 Tetris.exe: tetris.cpp $(LIBS_OBJW64)
-	$(CXX) -o $@ $< $(CXXFLAGS) $(DBG) $(INCLUDE_F) -L$(DuEngineDIR) -llibglad -llibDuEngine $(LIBSW64) -Wl,-rpath=$(DuEngineDIR) $(OPTIMIZATION) $(LIBSW64)
+	$(CXX) -o $@ $< $(CXXFLAGS) $(DBG) $(INCLUDE_F) -L$(DuEngineDIR) -llibDuEngine $(LIBSW64) -Wl,-rpath=$(DuEngineDIR) $(OPTIMIZATION) $(LIBSW64)
 
 .PHONY: clear Prepare clearAll DuEngineBuild DuEngineBuildw64
 clear:
@@ -37,4 +37,5 @@ DuEngineBuild:
 
 $(LIBS_OBJW64): DuEngineBuildw64
 DuEngineBuildw64:
-	$(MAKE) -C DuEngine buildwin
+	$(MAKE) -C DuEngine buildwin DUENG_WIN=""
+	#DUENG_WIN is used by imgui makefile
