@@ -284,24 +284,25 @@ Tetris::~Tetris() {
 	delete Map;
 	delete atual;
 	delete next;
+	delete blockText;
 }
 
 }  // namespace scene
 void SetupFunc();
 int main(){
-	Setup = SetupFunc;
+	SetSetup(SetupFunc);
 	Start("DuTetris", 1);
 	return 0;
 }
 
 void load_assets(){
-	auto &korobeiniki = Man::Manager::Insatance->LoadOGG("assets/korobeiniki.ogg");
-	putBlock = Man::Manager::Insatance->LoadOGG("assets/sfx_sounds_impact1.ogg");
+	auto &korobeiniki = Man::Manager::Instance->LoadOGG("assets/korobeiniki.ogg");
+	putBlock = Man::Manager::Instance->LoadOGG("assets/sfx_sounds_impact1.ogg");
 	audio::audioOut->EnqueueMusic(korobeiniki);//Need to make controlable outside this function
 	assets_loaded = true;
 }
 void SetupFunc() {
-	std::thread(load_assets).detach();
+	load_assets();//Segfault when exiting MainLoop before thread exit, thread must be destroyed with scene or add an object with lifetime from Setup() to CleanUp() that will control thread lifetime
 	new scene::Tetris;
 }
 #ifdef _WIN32

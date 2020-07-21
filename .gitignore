@@ -36,3 +36,4 @@
 /build/
 /assets/
 *.code-workspace
+log*.txt
