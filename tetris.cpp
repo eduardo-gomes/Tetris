@@ -231,6 +231,7 @@ void Tetris::Update(int64_t delta) {
 		if (keyboard::w) if (atual->rotate(1))  	keyboard::w = 0;
 		if (keyboard::d) if (atual->move(1, 0)) 	keyboard::d = 0;
 		if (keyboard::a) if (atual->move(-1, 0)) 	keyboard::a = 0;
+		if (keyboard::s) nextMoveTime -= moveTime * 2 / 3;
 		if (keyboard::space){
 			while (!atual->cantMove(0, -1)) atual->move(0, -1);
 		keyboard::space = 0;
@@ -244,7 +245,7 @@ void Tetris::Update(int64_t delta) {
 		atual = next;
 		next = randomPeca();
 		if(atual->cantMove(0, 0)){
-			printf("Can't spawn, points: %d \n", points);
+			logger::user("Can't spawn, points: " + std::to_string(points));
 			new Tetris;
 		}
 	}
