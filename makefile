@@ -12,6 +12,8 @@ INCLUDE_F=$(patsubst %, -I$(DuEngineDIR)/%, $(_INLCUDE_F))
 
 LIBS_OBJ=libDuEngine.so
 LIBS_OBJW64=libDuEngine.dll
+%.o: %.cpp $(LIBS_OBJ)
+	$(CXX) -o $@ $< $(CXXFLAGS) $(OPTIMIZATION) $(DBG) $(INCLUDE_F) -L$(DuEngineDIR) -lDuEngine $(LIBS) -Wl,-rpath=$(DuEngineDIR)
 Tetris.o: tetris.cpp $(LIBS_OBJ)
 	$(CXX) -o $@ $< $(CXXFLAGS) $(OPTIMIZATION) $(DBG) $(INCLUDE_F) -L$(DuEngineDIR) -lDuEngine $(LIBS) -Wl,-rpath=$(DuEngineDIR)
 
