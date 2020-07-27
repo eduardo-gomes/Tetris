@@ -3,8 +3,10 @@ inline void breakout::tile::drawn() {
 	renderer->DrawnQuad({x, y, 0.0}, color, {TILES_H_SIZE, TILES_V_SIZE});
 }
 breakout::tile::tile(int indexX, int indexY) {
-	x = TILES_BORDER_ABSOLUTE * indexX + TILES_H_SIZE * (indexX - 1) + TILES_H_SIZE / 2;
-	y = TILES_BORDER_ABSOLUTE * indexY + TILES_V_SIZE * (indexY - 1) + TILES_V_SIZE / 2 + TILES_V_OFSSET;
+	color.v0 = (float)indexX / TILES_COLUMNS;
+	color.v1 = (float)indexY / TILES_ROWS;
+	x =  (TILES_BORDER_ABSOLUTE * indexX + TILES_H_SIZE * (indexX - 1) + TILES_H_SIZE / 2) + TILES_H_OFSSET;
+	y = -(TILES_BORDER_ABSOLUTE * indexY + TILES_V_SIZE * (indexY - 1) + TILES_V_SIZE / 2) + TILES_V_OFSSET;
 }
 
 breakout::pbar::pbar() {
@@ -74,7 +76,9 @@ void breakout::Update(int64_t deltaNano) {
 
 void breakout::Render() {
 	renderer->DrawnQuad({0.0, 0.0, 0.0}, {0.0, 1.0, 1.0, 0.5}, {2.0 * ASPECT_RATIO, 2.0});
-	//Drawn enemies
+	for(auto &tileMapRow : tilemap)
+		for(auto & tile: tileMapRow)
+			if (tile.isAlive()) tile.drawn();
 	bar.drawn();
 	bola.drawn();
 	renderer->Drawn();
